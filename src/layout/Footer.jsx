@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 
+
 const Footer = () => {
+
+
   return (
     <footer className="w-full">
       {/* bandage- social */}
@@ -10,15 +13,16 @@ const Footer = () => {
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           
-            <h2 className="text-2xl font-bold text-[#252B42]">
+         <h2 className="text-2xl font-bold text-[#252B42]">
               Bandage
             </h2>
             
     
-            <div className="flex items-center gap-5">
+       <div className="flex items-center gap-5">
               <Facebook 
                 className="text-[#23A6F0] cursor-pointer hover:opacity-80" 
                 size={24} 
+
               />
               <Instagram 
                 className="text-[#23A6F0] cursor-pointer hover:opacity-80" 

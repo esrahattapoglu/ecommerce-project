@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 const ProductCard = ({ image, title = "Graphic Design", department = "English Department", oldPrice = "16.48", newPrice = "6.48" }) => {
   return (
-    <div className="flex flex-col group cursor-pointer">
+    <Link to="/product/1" className="flex flex-col group cursor-pointer">
       
       {/*ürünn görseli*/}
       <div className="relative w-full aspect-[3/4] overflow-hidden bg-gray-100">
@@ -37,7 +37,7 @@ const ProductCard = ({ image, title = "Graphic Design", department = "English De
         </div>
 
       </div>
-    </div>
+    </Link>
   );
 };
 

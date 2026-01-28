@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import HeroSlider from '../components/HeroSlider';
 
+
 const HomePage = () => {
   return (
     <div className="w-full ">

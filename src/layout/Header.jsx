@@ -73,6 +73,15 @@ const Header = () => {
               <Link to="/about" className="text-[#737373] hover:text-[#23856D] font-medium text-sm">
                 About
               </Link>
+
+              <Link to="/team" className="text-[#737373] hover:text-[#23856D] font-medium text-sm">
+               Team
+              </Link>
+
+
+
+
+
               <Link to="/blog" className="text-[#737373] hover:text-[#23856D] font-medium text-sm">
                 Blog
               </Link>
@@ -147,6 +156,16 @@ const Header = () => {
                 >
                   About
                 </Link>
+
+                <Link 
+               to="/team" 
+               className="text-[#737373] hover:text-[#23856D] font-medium text-xl"
+                onClick={() => setIsMobileMenuOpen(false)}
+                >
+                Team
+               </Link>
+
+
                 <Link 
                   to="/blog" 
                   className="text-[#737373] hover:text-[#23856D] font-medium text-xl"
