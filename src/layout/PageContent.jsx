@@ -7,6 +7,8 @@ import ProductDetailPage from '../pages/ProductDetailPage';
 import ContactPage from '../pages/ContactPage';
 import TeamPage from '../pages/TeamPage';
 import AboutPage from '../pages/AboutPage';
+import SignUpPage from '../pages/SignUpPage';
+import LoginPage from '../pages/LoginPage';
 
 const PageContent = () => {
   return (
@@ -17,7 +19,13 @@ const PageContent = () => {
         <Switch>
           <Route exact path="/">
             <HomePage /> 
+
           </Route>
+          
+          <Route path="/shop/:gender/:categoryName/:categoryId">
+            <ShopPage />
+          </Route>
+
           <Route path="/shop">
             <ShopPage />
           </Route>
@@ -35,6 +43,14 @@ const PageContent = () => {
 
           <Route path="/about">
            <AboutPage />
+          </Route>
+
+          <Route path="/signup">           
+            <SignUpPage />
+          </Route>
+
+          <Route path="/login">           
+            <LoginPage />
           </Route>
         </Switch>
       </main>
