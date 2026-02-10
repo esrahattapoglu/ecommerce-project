@@ -13,7 +13,7 @@ const LoginPage = () => {
   
   const { register, handleSubmit, formState: { errors } } = useForm();
   
-  // Form submit
+  //form submit
   const onSubmit = async (data) => {
     setLoading(true);
     
@@ -24,23 +24,26 @@ const LoginPage = () => {
         password: data.password
       }));
       
-      // Remember me kontrolü
+      // tokenı her zaman kaydet
+      localStorage.setItem('token', response.token);
+      
+      //remember me flag'ini kaydet (logoutta kullanılacak)
       if (data.rememberMe) {
-        localStorage.setItem('token', response.token);
+        localStorage.setItem('rememberMe', 'true');
       } else {
-        localStorage.removeItem('token');
+        localStorage.setItem('rememberMe', 'false');
       }
       
-      // Başarı mesajı
+      //başarı mesajı
       toast.success('Login successful!');
       
-      // 1 saniye sonra redirect
+      //1 saniye sonra redirect
       setTimeout(() => {
         history.goBack();
       }, 1000);
       
     } catch (error) {
-      // Hata mesajı
+      //hata mesajı
       toast.error(error.message || 'Login failed. Please try again.');
       setLoading(false);
     }
@@ -49,13 +52,13 @@ const LoginPage = () => {
   return (
     <div className="w-full min-h-screen bg-white">
       
-      {/* Container */}
+      {/*container */}
       <div className="container mx-auto px-8 lg:px-12 py-12 lg:py-20">
         
-        {/* Form wrapper */}
+        {/*form wrapper */}
         <div className="max-w-md mx-auto">
           
-          {/* Title */}
+          {/* title */}
           <div className="text-center mb-10">
             <h1 className="text-[#252B42] font-bold text-4xl mb-4">
               Login
@@ -65,10 +68,10 @@ const LoginPage = () => {
             </p>
           </div>
           
-          {/* Form */}
+          {/* form */}
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
             
-            {/* Email */}
+            {/*email */}
             <div className="flex flex-col gap-2">
               <label className="text-[#252B42] font-bold text-sm">
                 Email <span className="text-red-500">*</span>
@@ -87,7 +90,7 @@ const LoginPage = () => {
               )}
             </div>
             
-            {/* Password */}
+            {/*password */}
             <div className="flex flex-col gap-2">
               <label className="text-[#252B42] font-bold text-sm">
                 Password <span className="text-red-500">*</span>
@@ -108,7 +111,7 @@ const LoginPage = () => {
               )}
             </div>
             
-            {/* Remember me */}
+            {/*remember me */}
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -121,7 +124,7 @@ const LoginPage = () => {
               </label>
             </div>
             
-            {/* Submit button */}
+            {/*submit button */}
             <button
               type="submit"
               disabled={loading}
@@ -142,7 +145,7 @@ const LoginPage = () => {
               )}
             </button>
             
-            {/* Sign up link */}
+            {/* sign up link */}
             <div className="text-center mt-4">
               <p className="text-[#737373] text-sm">
                 Don't have an account?{' '}

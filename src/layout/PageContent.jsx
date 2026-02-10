@@ -9,6 +9,12 @@ import TeamPage from '../pages/TeamPage';
 import AboutPage from '../pages/AboutPage';
 import SignUpPage from '../pages/SignUpPage';
 import LoginPage from '../pages/LoginPage';
+import CartPage from '../pages/CartPage'; 
+import ProtectedRoute from '../components/ProtectedRoute';
+import CreateOrderPage from '../pages/CreateOrderPage'; 
+import OrderHistoryPage from '../pages/OrderHistoryPage';
+import BlogPage from '../pages/BlogPage';
+import WishlistPage from '../pages/WishlistPage'; 
 
 const PageContent = () => {
   return (
@@ -17,9 +23,12 @@ const PageContent = () => {
       
       <main className="flex-grow">
         <Switch>
+
+          
+          <ProtectedRoute path="/order-history" component={OrderHistoryPage} />
+
           <Route exact path="/">
             <HomePage /> 
-
           </Route>
           
           <Route path="/shop/:gender/:categoryName/:categoryId">
@@ -29,7 +38,8 @@ const PageContent = () => {
           <Route path="/shop">
             <ShopPage />
           </Route>
-          <Route path="/product/:id">
+
+          <Route path="/product/:gender/:categoryName/:categoryId/:productNameSlug/:productId">
             <ProductDetailPage />
           </Route>
 
@@ -42,7 +52,16 @@ const PageContent = () => {
           </Route>
 
           <Route path="/about">
-           <AboutPage />
+            <AboutPage />
+          </Route>
+
+          <Route path="/blog">
+            <BlogPage />
+          </Route>
+
+          
+          <Route path="/wishlist">
+            <WishlistPage />
           </Route>
 
           <Route path="/signup">           
@@ -52,6 +71,13 @@ const PageContent = () => {
           <Route path="/login">           
             <LoginPage />
           </Route>
+
+          <Route path="/cart">
+            <CartPage />
+          </Route>
+
+          <ProtectedRoute path="/create-order" component={CreateOrderPage} />
+
         </Switch>
       </main>
       

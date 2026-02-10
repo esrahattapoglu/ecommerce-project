@@ -3,13 +3,19 @@ import authReducer from './authReducer';
 import clientReducer from './clientReducer';
 import productReducer from './productReducer';
 import shoppingCartReducer from './shoppingCartReducer';  
+import addressReducer from './addressReducer'; 
+import cardReducer from './cardReducer'; 
+import orderReducer from './orderReducer';
 
-// Tüm reducer'ları birleştir
+// Tüm reducer'ları birleştirme
 const rootReducer = combineReducers({
   auth: authReducer,         
   client: clientReducer,     
   product: productReducer,  
-  shopping: shoppingCartReducer  
+  shopping: shoppingCartReducer,
+  address: addressReducer,
+  card: cardReducer,
+  order: orderReducer    
 });
 
 export default rootReducer;

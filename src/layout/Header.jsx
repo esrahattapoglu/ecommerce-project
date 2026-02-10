@@ -1,38 +1,114 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Gravatar from 'react-gravatar';
 import { logoutAction } from '../store/actions/authActions';
 import { fetchCategoriesAction } from '../store/actions/clientActions';
 import { 
   Phone, Mail, Instagram, Youtube, Facebook, Twitter,
-  ShoppingCart, Heart, Search, Menu, ChevronDown, User
+  ShoppingCart, Heart, Search, Menu, ChevronDown, User, Package
 } from 'lucide-react';
+import CartDropdown from '../components/CartDropdown';
+import SearchModal from '../components/SearchModal';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
+  const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0); 
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  
+  const cartDropdownRef = useRef(null);
+  const userDropdownRef = useRef(null);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const user = useSelector(state => state.client.user);
   const categories = useSelector(state => state.client.categories);
   const isLoggedIn = user && user.email;
 
-  // Kategorileri çek
+  const cart = useSelector(state => state.shopping.cart);
+  const cartItemCount = cart.reduce((total, item) => total + item.count, 0);
+
   useEffect(() => {
     dispatch(fetchCategoriesAction());
   }, [dispatch]);
 
-  // Kategorileri sırala
-const womenCategories = categories
-  .filter(cat => cat.gender === 'k')
-  .sort((a, b) => b.rating - a.rating);//Rating'e göre sırala
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-const menCategories = categories
-  .filter(cat => cat.gender === 'e')
-  .sort((a, b) => b.rating - a.rating);//Rating'e göre sırala
+  //  Wishlist sayısını localStorage'dan oku
+  useEffect(() => {
+    const updateWishlistCount = () => {
+      const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      setWishlistCount(wishlist.length);
+    };
 
-  // türkçe ingilizce çeviri
+    //ilk yüklemede oku
+    updateWishlistCount();
+
+    window.addEventListener('storage', updateWishlistCount);
+
+    window.addEventListener('wishlistUpdated', updateWishlistCount);
+
+    return () => {
+      window.removeEventListener('storage', updateWishlistCount);
+      window.removeEventListener('wishlistUpdated', updateWishlistCount);
+    };
+  }, []);
+
+  //cart dropdown dışına tıklayınca kapat
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (cartDropdownRef.current && !cartDropdownRef.current.contains(event.target)) {
+        setIsCartDropdownOpen(false);
+      }
+    };
+
+    if (isCartDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCartDropdownOpen]);
+
+  //user dropdown dışına tıklayınca kapat
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+
+    if (isUserDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isUserDropdownOpen]);
+
+  const womenCategories = categories
+    .filter(cat => cat.gender === 'k')
+    .sort((a, b) => b.rating - a.rating);
+
+  const menCategories = categories
+    .filter(cat => cat.gender === 'e')
+    .sort((a, b) => b.rating - a.rating);
+
   const categoryTranslations = {
     'Tişört': 'T-Shirt',
     'Ayakkabı': 'Shoes',
@@ -48,7 +124,6 @@ const menCategories = categories
     return categoryTranslations[title] || title;
   };
 
-  // Helper fonksiyonlar
   const slugify = (text) => {
     return text
       .toLowerCase()
@@ -68,17 +143,26 @@ const menCategories = categories
   const handleLogout = () => {
     dispatch(logoutAction());
     setIsMobileMenuOpen(false);
+    setIsUserDropdownOpen(false);
     window.location.href = '/';
+  };
+
+  const handleCartClick = () => {
+    if (isMobile) {
+      history.push('/cart');
+    } else {
+      setIsCartDropdownOpen(!isCartDropdownOpen);
+    }
   };
 
   return (
     <header className="w-full">
-      {/* Top Bar */}
+      {/*top bar */}
       <div className="hidden md:flex bg-[#252B42] text-white">
         <div className="w-full px-8">
           <div className="flex justify-between items-center h-[58px] text-sm">
             
-            {/* Contact Info */}
+            {/*contact info */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Phone size={16} />
@@ -90,12 +174,12 @@ const menCategories = categories
               </div>
             </div>
 
-            {/* Promo Text */}
+            {/*promo text */}
             <div className="font-bold">
               Follow Us and get a chance to win 80% off
             </div>
 
-            {/* Social Media */}
+            {/*social media */}
             <div className="flex items-center gap-3">
               <span>Follow Us :</span>
               <div className="flex items-center gap-2">
@@ -109,23 +193,22 @@ const menCategories = categories
         </div>
       </div>
 
-      {/* Main Navbar */}
+      {/*main navbar */}
       <nav className="bg-white">
         <div className="w-full px-8">
           <div className="flex items-center justify-between h-[70px]">
             
-            {/* Logo */}
+            {/*logo */}
             <Link to="/" className="text-2xl font-bold text-[#252B42]">
               Bandage
             </Link>
 
-            {/* Desktop Navigation */}
+            {/*desktop navigation */}
             <div className="hidden md:flex items-center gap-4 mr-auto ml-32">
               <Link to="/" className="text-[#737373] hover:text-[#23856D] font-medium text-sm">
                 Home
               </Link>
               
-             
               <div 
                 className="relative"
                 onMouseEnter={() => setIsShopDropdownOpen(true)}
@@ -136,13 +219,12 @@ const menCategories = categories
                   <ChevronDown size={14} />
                 </div>
 
-                {/* Dropdown Menu (boşluk yok) */}
                 {isShopDropdownOpen && (
                   <div className="absolute top-full left-0 pt-2 z-50">
                     <div className="bg-white shadow-lg border border-gray-200 rounded-md p-6 min-w-[400px]">
                       <div className="grid grid-cols-2 gap-8">
                         
-                        {/* Women Categories */}
+                        {/*women categories */}
                         <div>
                           <h3 className="font-bold text-[#252B42] mb-3">
                             Women
@@ -214,33 +296,52 @@ const menCategories = categories
                 Contact
               </Link>
               
-              <Link to="/pages" className="text-[#737373] hover:text-[#23856D] font-medium text-sm">
-                Pages
-              </Link>
+              
             </div>
 
-            {/* Right Icons */}
+            {/*right icons */}
             <div className="flex items-center gap-3">
               
-              {/* Desktop - Login/Register or User Info */}
+              {/*Desktop User Dropdown */}
               {isLoggedIn ? (
-                <div className="hidden md:flex items-center gap-3">
-                  <Gravatar 
-                    email={user.email} 
-                    size={32}
-                    rating="pg"
-                    default="mp"
-                    className="rounded-full"
-                  />
-                  <span className="text-[#23A6F0] font-medium text-sm">
-                    {user.name}
-                  </span>
-                  <button 
-                    onClick={handleLogout}
-                    className="text-[#737373] hover:text-[#23A6F0] font-medium text-sm"
+                <div className="hidden md:block relative" ref={userDropdownRef}>
+                  <div 
+                    onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                    className="flex items-center gap-2 cursor-pointer hover:opacity-80"
                   >
-                    Logout
-                  </button>
+                    <Gravatar 
+                      email={user.email} 
+                      size={32}
+                      rating="pg"
+                      default="mp"
+                      className="rounded-full"
+                    />
+                    <span className="text-[#23A6F0] font-medium text-sm">
+                      {user.name}
+                    </span>
+                    <ChevronDown size={14} className="text-[#23A6F0]" />
+                  </div>
+
+                  {/*dropdown menu */}
+                  {isUserDropdownOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg border border-gray-200 rounded-md py-2 z-50">
+                      <Link
+                        to="/order-history"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-[#737373] hover:bg-gray-50 hover:text-[#23A6F0]"
+                        onClick={() => setIsUserDropdownOpen(false)}
+                      >
+                        <Package size={16} />
+                        My Orders
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#737373] hover:bg-gray-50 hover:text-[#23A6F0] text-left"
+                      >
+                        <User size={16} />
+                        Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="hidden md:flex items-center gap-1 text-[#23A6F0] font-medium text-sm">
@@ -255,24 +356,41 @@ const menCategories = categories
                 </div>
               )}
              
-              {/* Search */}
-              <button className="text-[#737373] md:text-[#23A6F0] hover:opacity-80">
-                <Search size={18} />
-              </button>
+              {/*search */}
+              <button 
+  onClick={() => setIsSearchModalOpen(true)}
+  className="text-[#737373] md:text-[#23A6F0] hover:opacity-80"
+>
+  <Search size={18} />
+</button>
 
-              {/* Cart */}
-              <Link to="/cart" className="flex items-center gap-1 text-[#737373] md:text-[#23A6F0] hover:opacity-80">
-                <ShoppingCart size={18} />
-                <span className="text-xs">1</span>
-              </Link>
 
-              {/* Wishlist */}
+              {/*cart */}
+              <div className="relative" ref={cartDropdownRef}>
+                <div 
+                  onClick={handleCartClick}
+                  className="flex items-center gap-1 text-[#737373] md:text-[#23A6F0] hover:opacity-80 cursor-pointer"
+                >
+                  <ShoppingCart size={18} />
+                  {cartItemCount > 0 && (
+                    <span className="text-xs">{cartItemCount}</span>
+                  )}
+                </div>
+                
+                {!isMobile && isCartDropdownOpen && (
+                  <CartDropdown onClose={() => setIsCartDropdownOpen(false)} />
+                )}
+              </div>
+
+              {/*wishlist  */}
               <Link to="/wishlist" className="hidden md:flex items-center gap-1 text-[#23A6F0] hover:opacity-80">
                 <Heart size={18} />
-                <span className="text-xs">1</span>
+                {wishlistCount > 0 && (
+                  <span className="text-xs">{wishlistCount}</span>
+                )}
               </Link>
 
-              {/* Mobile Menu Toggle */}
+              {/*mobile menu toggle */}
               <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden text-[#737373]"
@@ -282,7 +400,7 @@ const menCategories = categories
             </div>
           </div>
 
-          {/* Mobile Menu */}
+          {/*mobile menu */}
           {isMobileMenuOpen && (
             <div className="md:hidden pb-6 pt-2">
               <div className="flex flex-col gap-5 text-center">
@@ -335,14 +453,9 @@ const menCategories = categories
                   Contact
                 </Link>
                 
-                <Link 
-                  to="/pages" 
-                  className="text-[#737373] hover:text-[#23856D] font-medium text-xl"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Pages
-                </Link>
+                
 
+                {/*mobile user section */}
                 {isLoggedIn ? (
                   <div className="flex flex-col items-center gap-4">
                     <div className="flex items-center gap-3">
@@ -357,6 +470,13 @@ const menCategories = categories
                         {user.name}
                       </span>
                     </div>
+                    <Link
+                      to="/order-history"
+                      className="text-[#737373] hover:text-[#23A6F0] font-medium text-sm"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      My Orders
+                    </Link>
                     <button 
                       onClick={handleLogout}
                       className="text-[#737373] hover:text-[#23A6F0] font-medium text-sm"
@@ -388,11 +508,14 @@ const menCategories = categories
                 <div className="flex flex-col items-center justify-center gap-4 mt-2">
                   
                   <button 
-                    className="text-[#23A6F0] hover:opacity-80"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Search size={24} />
-                  </button>
+  onClick={() => {
+    setIsSearchModalOpen(true);
+    setIsMobileMenuOpen(false);
+  }}
+  className="text-[#23A6F0] hover:opacity-80"
+>
+  <Search size={24} />
+</button>
 
                   <Link 
                     to="/cart" 
@@ -400,16 +523,19 @@ const menCategories = categories
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <ShoppingCart size={24} />
-                    <span className="text-sm">1</span>
+                    <span className="text-sm">{cartItemCount}</span>
                   </Link>
 
+                  {/*mobile wishlist  */}
                   <Link 
                     to="/wishlist" 
                     className="flex items-center gap-1 text-[#23A6F0] hover:opacity-80"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <Heart size={24} />
-                    <span className="text-sm">1</span>
+                    {wishlistCount > 0 && (
+                      <span className="text-sm">{wishlistCount}</span>
+                    )}
                   </Link>
 
                 </div>
@@ -419,6 +545,11 @@ const menCategories = categories
           )}
         </div>
       </nav>
+      {/*search modal */}
+      <SearchModal 
+        isOpen={isSearchModalOpen} 
+        onClose={() => setIsSearchModalOpen(false)} 
+      />
     </header>
   );
 };

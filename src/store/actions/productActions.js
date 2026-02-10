@@ -5,10 +5,11 @@ import {
   SET_FETCH_STATE, 
   SET_LIMIT, 
   SET_OFFSET, 
-  SET_FILTER 
+  SET_FILTER,
+  SET_SELECTED_PRODUCT  
 } from '../reducers/productReducer';
 
-import { fetchProducts } from '../../api/clientAPI';  
+import { fetchProducts, fetchProductById } from '../../api/clientAPI';  
 
 // ACTION CREATORS
 
@@ -47,12 +48,18 @@ export const setFilter = (filter) => ({
   payload: filter
 });
 
-// THUNK ACTION
+
+export const setSelectedProduct = (product) => ({
+  type: SET_SELECTED_PRODUCT,
+  payload: product
+});
+
+// THUNK ACTIONS
+
 export const fetchProductsAction = (params = {}) => async (dispatch) => {
   try {
     dispatch(setFetchState('FETCHING'));
     
-    //  Parametreleri gönder
     const data = await fetchProducts(params);
     
     dispatch(setProductList(data.products));
@@ -61,6 +68,22 @@ export const fetchProductsAction = (params = {}) => async (dispatch) => {
     
   } catch (error) {
     console.error('Ürünler yüklenirken hata:', error);
+    dispatch(setFetchState('FAILED'));
+  }
+};
+
+
+export const fetchProductByIdAction = (productId) => async (dispatch) => {
+  try {
+    dispatch(setFetchState('FETCHING'));
+    
+    const data = await fetchProductById(productId);
+    
+    dispatch(setSelectedProduct(data));
+    dispatch(setFetchState('FETCHED'));
+    
+  } catch (error) {
+    console.error('Ürün yüklenirken hata:', error);
     dispatch(setFetchState('FAILED'));
   }
 };

@@ -6,6 +6,7 @@ const SET_FETCH_STATE = 'SET_FETCH_STATE';
 const SET_LIMIT = 'SET_LIMIT';
 const SET_OFFSET = 'SET_OFFSET';
 const SET_FILTER = 'SET_FILTER';
+const SET_SELECTED_PRODUCT = 'SET_SELECTED_PRODUCT'; 
 
 // Initial state
 const initialState = {
@@ -15,7 +16,8 @@ const initialState = {
   limit: 25,             
   offset: 0,             
   filter: '',           
-  fetchState: 'NOT_FETCHED' 
+  fetchState: 'NOT_FETCHED',
+  selectedProduct: null  
 };
 
 // Reducer fonksiyonu
@@ -63,6 +65,13 @@ const productReducer = (state = initialState, action) => {
         filter: action.payload
       };
     
+    
+    case SET_SELECTED_PRODUCT:
+      return {
+        ...state,
+        selectedProduct: action.payload
+      };
+    
     default:
       return state;
   }
@@ -78,5 +87,6 @@ export {
   SET_FETCH_STATE, 
   SET_LIMIT, 
   SET_OFFSET, 
-  SET_FILTER 
+  SET_FILTER,
+  SET_SELECTED_PRODUCT  
 };
