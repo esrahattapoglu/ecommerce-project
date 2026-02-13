@@ -6,8 +6,8 @@ const TeamPage = () => {
   const teamMembers = [
     {
       id: 1,
-      name: "Username",
-      profession: "Profession",
+      name: "Esra Hattapoğlu",
+      profession: "Software Developer",
       image: "/teamPage/member-1.png",
       social: {
         facebook: "#",
