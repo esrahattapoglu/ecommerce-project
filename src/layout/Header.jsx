@@ -309,13 +309,7 @@ const Header = () => {
                     onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
                     className="flex items-center gap-2 cursor-pointer hover:opacity-80"
                   >
-                    <Gravatar 
-                      email={user.email} 
-                      size={32}
-                      rating="pg"
-                      default="mp"
-                      className="rounded-full"
-                    />
+                    <User size={24} className="text-[#23A6F0]" />
                     <span className="text-[#23A6F0] font-medium text-sm">
                       {user.name}
                     </span>
